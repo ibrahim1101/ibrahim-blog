@@ -26,3 +26,16 @@ The `schedule` section of `config.json` sets the time zone, draft time, lookback
 ## Backup and maintenance
 
 Back up `config.json`, `drafts/`, and `data/` regularly while the scheduler is stopped. SQLite backups should use SQLite's backup API or a cleanly stopped process. Restore those files into a fresh installation. Never commit draft evidence, private credentials, databases, or the virtual environment. Update dependencies deliberately and run validation after updates. The included Python and npm dependency constraints are not a substitute for vulnerability monitoring.
+
+## Candidate queue
+
+Collect multiple headlines without generating or publishing articles, then select one:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\candidates.py collect --category cyber
+.\.venv\Scripts\python.exe scripts\candidates.py list
+.\.venv\Scripts\python.exe scripts\candidates.py generate <candidate-id>
+.\.venv\Scripts\python.exe scripts\candidates.py reject <candidate-id>
+```
+
+The queue is local SQLite and deduplicates exact URLs. Generation claims a candidate before starting; a crash can leave it `GENERATING`, so inspect outputs before manually repairing its state. A selected candidate may still fail retrieval or editorial checks. It creates a review-required local draft, never a public article.

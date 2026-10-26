@@ -207,9 +207,11 @@ def main():
     ap.add_argument('--list', action='store_true', help='List fresh headlines, no AI')
     ap.add_argument('--dry-run', action='store_true', help='Show selected sources, no AI')
     ap.add_argument('--url', help='Use one specific public article URL')
+    ap.add_argument('--title', help='Story title for a supplied URL')
     ap.add_argument('--force', action='store_true', help='Allow previously used topic')
     ap.add_argument('--job-id', help=argparse.SUPPRESS)
     args = ap.parse_args()
+    if args.title and not args.url: ap.error('--title requires --url')
     if args.job_id and not re.fullmatch(r'\d{4}-\d{2}-\d{2}',args.job_id): ap.error('invalid job id')
     history_path = ROOT / 'data' / 'history.json'
     history = json.loads(history_path.read_text(encoding='utf-8')) if history_path.exists() else []
@@ -217,7 +219,7 @@ def main():
     if args.url:
         if not valid_public_url(args.url):
             sys.exit('Invalid URL')
-        items = [{'title': urlparse(args.url).path.rsplit('/', 1)[-1].replace('-', ' ') or 'Selected article',
+        items = [{'title': args.title or urlparse(args.url).path.rsplit('/', 1)[-1].replace('-', ' ') or 'Selected article',
                   'url': args.url, 'published': 'unknown', 'feed': 'manual'}]
     else:
         items = collect(args.category)
