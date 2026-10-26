@@ -16,3 +16,14 @@ The command asks you to type `STAGE`. Staging copies the article to the website 
 The build renders all Markdown files under `website/src/content/articles`; it cannot by itself distinguish a reviewed file from an unreviewed one. **The required security boundary is repository permissions, protected production branch, and Cloudflare production deployment restricted to that branch.** Until those account settings are verified, unapproved content could be published by a direct push or unsafe deployment configuration. PR previews may expose staged content; disable public previews or use access control if needed.
 
 For corrections, edit an existing article on a review branch, add an `updated` date and a clearly visible correction note, and repeat review and merge. No automatic publication feature exists in this project.
+
+## Local review history
+
+After checking the draft and its evidence, record an advisory local decision:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\editor.py decision '<draft filename>.md' --state REVIEWED --reviewer 'Shaik Ibrahim' --note 'Checked each claim and original source'
+.\.venv\Scripts\python.exe scripts\editor.py history '<draft filename>.md'
+```
+
+REVIEWED, NEEDS_REVISION and REJECTED are local audit notes, not authenticated approval or a publish command. The status returns to REVIEW_REQUIRED when the draft, research evidence or quality report changes. The append-only event list is local SQLite and is not tamper-proof. GitHub permissions and branch protection are still required for publication.

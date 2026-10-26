@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Persistent, draft-only scheduler. A failed or interrupted slot is never silently rerun."""
-import argparse,datetime as dt,json,sqlite3,subprocess,sys
+import argparse,datetime as dt,hashlib,json,sqlite3,subprocess,sys
 from pathlib import Path
 from zoneinfo import ZoneInfo
 ROOT=Path(__file__).resolve().parents[1]
@@ -15,6 +15,20 @@ def slot(day):
 def due_days(today,days=7):
     return [(d,slot(d)) for n in range(days,-1,-1) if slot(d:=today-dt.timedelta(days=n))]
 
+def completed_job(root,key):
+    marker=root/'data'/'jobs'/f'{key}.json'
+    try:
+        manifest=json.loads(marker.read_text(encoding='utf8'))
+        files=manifest['files']
+        if manifest['job_id']!=key or not isinstance(files,list) or len(files)!=3:return False
+        for item in files:
+            name=item['name']
+            if Path(name).name != name:return False
+            data=(root/'drafts'/name).read_bytes()
+            if hashlib.sha256(data).hexdigest()!=item['sha256']:return False
+        return True
+    except (OSError,ValueError,KeyError,TypeError):return False
+
 def main():
     cfg=json.loads((ROOT/'config.json').read_text(encoding='utf8')).get('schedule',{})
     p=argparse.ArgumentParser();p.add_argument('--lookback-days',type=int,default=cfg.get('lookback_days',7));p.add_argument('--list',action='store_true');p.add_argument('--retry-failed',action='store_true',default=cfg.get('retry_failed',False)); args=p.parse_args()
@@ -28,6 +42,8 @@ def main():
         db.execute('CREATE TABLE IF NOT EXISTS jobs (day TEXT PRIMARY KEY, category TEXT NOT NULL, state TEXT NOT NULL, updated TEXT NOT NULL)')
         for day,category in due_days(now.date(),args.lookback_days):
             key=day.isoformat();row=db.execute('SELECT state FROM jobs WHERE day=?',(key,)).fetchone()
+            if row and row[0] in ('running','failed') and completed_job(ROOT,key):
+                db.execute("UPDATE jobs SET state='drafted',updated=? WHERE day=?",(dt.datetime.now(dt.timezone.utc).isoformat(),key));db.commit();row=('drafted',)
             due=day<now.date() or now.time().replace(tzinfo=None)>=draft_time
             if args.list:print(key,category,(row[0] if row else ('pending' if due else 'not due')));continue
             if not due or (row and not (args.retry_failed and row[0]=='failed')):continue
@@ -37,7 +53,7 @@ def main():
             db.commit()
             if not changed:continue
             print('Preparing',key,category,flush=True)
-            try:result=subprocess.run([sys.executable,str(ROOT/'scripts'/'blog.py'),'--category',category],cwd=ROOT,timeout=7200);status='drafted' if result.returncode==0 else 'failed'
+            try:result=subprocess.run([sys.executable,str(ROOT/'scripts'/'blog.py'),'--category',category,'--job-id',key],cwd=ROOT,timeout=7200);status='drafted' if result.returncode==0 else 'failed'
             except subprocess.TimeoutExpired: status='failed'
             db.execute('UPDATE jobs SET state=?,updated=? WHERE day=?',(status,dt.datetime.now(dt.timezone.utc).isoformat(),key));db.commit()
     return 0
