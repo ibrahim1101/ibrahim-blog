@@ -2,7 +2,7 @@
 
 Create the intended GitHub repository and protect its production branch before adding content. Do not upload the original ZIP wholesale without inspecting it: local drafts, evidence, history, backups and secrets must remain private. `.gitignore` excludes those directories for new files, but already tracked files remain tracked until explicitly removed from the Git index.
 
-For Cloudflare Pages connect the repository, select the protected production branch, set root directory `website`, build command `npm run build`, and output directory `dist`. Use Node 22 or later. Only connect the new project; leave existing sites and unrelated DNS records unchanged. Add the new custom domain `blog.ibrahimshaik.com` using the Pages custom-domain workflow. Verify TLS, DNS and that only the protected branch deploys to production. Disable public PR preview deployments or protect them if drafts are sensitive.
+For Cloudflare Pages connect the repository, select the protected production branch, set root directory `website`, build command `npm run build`, and output directory `dist`. Use Node 24 or later. Only connect the new project; leave existing sites and unrelated DNS records unchanged. Add the new custom domain `blog.ibrahimshaik.com` using the Pages custom-domain workflow. Verify TLS, DNS and that only the protected branch deploys to production. Disable public PR preview deployments or protect them if drafts are sensitive.
 
 ## Contact form
 
