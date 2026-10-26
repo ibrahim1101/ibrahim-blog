@@ -1,0 +1,4 @@
+---
+import Base from '../layouts/Base.astro'; import {allArticles,categories,fmt} from '../lib'; const articles=await allArticles();
+---
+<Base title="Archive"><div class="wrap listing"><div class="eyebrow">The journal / All stories</div><h1>Archive</h1><p class="hero-copy">Every published story, in one place.</p><div class="section">{articles.length?<div class="grid">{articles.map(a=><article class="card"><div class="meta">{categories[a.data.category]} / {fmt(a.data.published)}</div><h3><a href={`/articles/${a.id}/`}>{a.data.title}</a></h3><p>{a.data.description}</p></article>)}</div>:<p class="empty">The archive is empty. Our first stories are on their way.</p>}</div></div></Base>

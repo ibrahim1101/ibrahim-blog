@@ -1,0 +1,138 @@
+{
+  "status": "REVIEW_REQUIRED",
+  "publication_allowed": false,
+  "automatic_publication_permitted": false,
+  "source_count": 2,
+  "distinct_source_domains": [
+    "bleepingcomputer.com",
+    "mezha.net"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.bleepingcomputer.com/news/security/university-of-copenhagen-data-breach-exposes-data-of-525-000-people/",
+      "domain": "bleepingcomputer.com",
+      "explicitly_attributes_to": [],
+      "provenance": "unverified",
+      "note": "No explicit attribution detected does not establish independence."
+    },
+    {
+      "url": "https://mezha.net/eng/news/mezha-72db9700e13ec246bc7cbf1b_university_of_copenhagen/",
+      "domain": "mezha.net",
+      "explicitly_attributes_to": [
+        "bleepingcomputer.com"
+      ],
+      "provenance": "downstream",
+      "note": "No explicit attribution detected does not establish independence."
+    }
+  ],
+  "claim_ledger": [
+    {
+      "claim": "The University of Copenhagen confirmed a data breach affecting 525,000 people.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "Hackers accessed a test environment containing personal data of 525,000 people.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The breach was detected on October 20, 2026, and disclosed on October 23, 2026.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "An additional 20,000 staff and students had their PIN codes exposed in an update on October 25, 2026.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The University of Copenhagen is still investigating the extent of the breach.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The breach may have exposed full names, national identity numbers, phone numbers, and email addresses.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The university restricted physical access to some critical locations on campus as a precaution.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The university says it contained the attack and blocked the attacker’s access.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The breach falls within the scope of the General Data Protection Regulation (GDPR).",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The university reported the incident to the Danish Data Protection Agency.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "Students and staff are advised to be cautious of unsolicited communications and verify requests independently.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The university promised to provide more updates on the impact as its internal investigation allows.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    }
+  ],
+  "flags": [
+    "Source dependency: one publication explicitly attributes reporting to another collected publication.",
+    "No independently verified official primary statement collected."
+  ],
+  "editorial_verdict": "Human verification required. Source diversity is not independent corroboration.",
+  "manual_review_checklist": [
+    "Open and check the official primary announcement.",
+    "Confirm each factual claim against linked source passages.",
+    "Check source dependence and syndication.",
+    "Preserve may/could/reported and no indication qualifiers.",
+    "Verify dates, figures, and the nature of access codes."
+  ]
+}

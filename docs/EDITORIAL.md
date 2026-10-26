@@ -1,0 +1,18 @@
+# Editorial workflow
+
+1. Run `python scripts/editor.py list` and then `python scripts/editor.py show <draft-filename>`. Open the original evidence links; read the complete quality report, source passages, and article. Confirm every claim, number, quote, date, uncertainty and source relationship. An automated ledger is not proof. Reject or rewrite unsupported content; perform additional research independently when needed. Do not include private evidence in a public repository.
+2. Start from a clean production branch, create a review branch, and stage a reviewed draft:
+
+```powershell
+git switch main
+git switch -c review/my-story
+.\.venv\Scripts\python.exe scripts\editor.py stage '<draft filename>.md' --title 'Reviewed title' --description 'Accurate summary' --category cyber --date '2026-10-27'
+```
+
+The command asks you to type `STAGE`. Staging copies the article to the website content folder; it is **not** human approval. Edit the staged Markdown and metadata, including disclosure and sources, to reflect your actual review. Check the local build with `.\validate.ps1`.
+3. Commit only the intended website article, push the review branch, then run `gh pr create --draft --title "Review: story title" --body "Editorial review required. Check every claim and source before publication."`. Open the PR, verify the actual changes, and finish human review. Do not commit the private `drafts/`, evidence or local database.
+4. Only after your explicit editorial decision, mark the PR ready, obtain whatever review the repository rules require, and manually merge it. Configure branch protection/rulesets to prevent direct pushes and require review, status checks and no bypass where the account permits. A self-review cannot satisfy GitHub's normal required-review rule for your own PR; use an eligible second reviewer or choose a different authenticated approval mechanism. CI success, a label or a model-generated report is not approval.
+
+The build renders all Markdown files under `website/src/content/articles`; it cannot by itself distinguish a reviewed file from an unreviewed one. **The required security boundary is repository permissions, protected production branch, and Cloudflare production deployment restricted to that branch.** Until those account settings are verified, unapproved content could be published by a direct push or unsafe deployment configuration. PR previews may expose staged content; disable public previews or use access control if needed.
+
+For corrections, edit an existing article on a review branch, add an `updated` date and a clearly visible correction note, and repeat review and merge. No automatic publication feature exists in this project.

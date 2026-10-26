@@ -1,0 +1,13 @@
+{
+  "ollama_url": "http://127.0.0.1:11434",
+  "research_model": "qwen3:8b",
+  "writer_model": "qwen3:14b",
+  "context_tokens": 8192,
+  "max_age_days": 14,
+  "feeds": {
+    "ai": ["https://huggingface.co/blog/feed.xml", "https://blog.google/technology/ai/rss/"],
+    "cyber": ["https://www.cisa.gov/cybersecurity-advisories/all.xml", "https://www.bleepingcomputer.com/feed/"],
+    "gaming": ["https://store.steampowered.com/feeds/news.xml", "https://www.pcgamer.com/rss/"],
+    "dev": ["https://github.blog/feed/", "https://devblogs.microsoft.com/python/feed/"]
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-10-26T23:30:40.271259+00:00",
+  "category": "cyber",
+  "primary": "https://www.bleepingcomputer.com/news/security/university-of-copenhagen-data-breach-exposes-data-of-525-000-people/",
+  "sources": [
+    {
+      "title": "University of Copenhagen data breach exposes data of 525,000 people",
+      "url": "https://www.bleepingcomputer.com/news/security/university-of-copenhagen-data-breach-exposes-data-of-525-000-people/",
+      "published": "2026-10-26T22:20:36+00:00",
+      "feed": "https://www.bleepingcomputer.com/feed/",
+      "text": "The University of Copenhagen in Denmark confirmed that hackers accessed one of its test environments containing personal data belonging to 525,000 people.\nThe educational organization detected the breach last Tuesday and disclosed it on Friday. In an update yesterday, the university added another 20,000 staff and students whose PIN codes were exposed.\n“The University of Copenhagen has confirmed a cyber attack in which hackers gained access to one of the university’s test environments,” the university says.\nFounded in 1479, the University of Copenhagen is Denmark’s oldest university and one of its leading research institutions. It has approximately 36,800 students and 10,700 employees, with six faculties and more than 200 research centers.\nThe University of Copenhagen is still investigating to determine the extent of the incident, but warns that the following information may have been exposed:\n- Full names\n- National identity numbers (CPR)\n- Phone numbers\n- Email addresses\nThe exposed information increases the risk of phishing and social engineering attacks.\nRegarding the PIN access exposure, the University of Copenhagen has restricted physical access to certain critical locations on its campus out of abundance of caution and is gradually reopening them as it distributes new access codes.\nThe university says it contained the attack and blocked the attacker’s access. Currently, there is no indication that hackers accessed systems supporting daily operations or disrupted university activities.\nThe university reported the incident to the Danish Data Protection Agency, but also said it falls within the scope of Europe’s General Data Protection Regulation (GDPR) and that it is taking the appropriate steps with the relevant regulators.\nStudents and staff whose data may have been exposed in this incident should be cautious of unsolicited communications and independently verify requests.\nThe university promised to provide more updates on the scope of the impact as soon as its internal investigation allows."
+    },
+    {
+      "title": "University of Copenhagen breach exposed data of 525,000 people",
+      "url": "https://mezha.net/eng/news/mezha-72db9700e13ec246bc7cbf1b_university_of_copenhagen/",
+      "published": "discovered",
+      "feed": "https://www.bing.com/news/search?q=University+of+Copenhagen+data+breach+exposes+data+of+525%2C000+people&format=rss",
+      "text": "University of Copenhagen breach exposed data of 525,000 people\nPhoto source: BleepingComputer\nThe university says it has contained the attack, but is still investigating how much information may have been exposed.\nHackers accessed a test environment at the University of Copenhagen containing personal data belonging to 525,000 people, the university confirmed.\nThis is reported by BleepingComputer.\nThe university detected the breach on Tuesday, October 20, and disclosed it on Friday, October 23. An update on Sunday, October 25, added another 20,000 staff and students whose PIN codes were exposed.\nThe University of Copenhagen has confirmed a cyber attack in which hackers gained access to one of the university’s test environments,\n– University of Copenhagen\nThe university is still investigating the extent of the incident. It warned that exposed information could increase the risk of phishing and social engineering attacks.\nAfter PIN codes were exposed, the university restricted physical access to some critical locations on campus as a precaution. It is gradually reopening those locations as it distributes new access codes.\nThe university says it contained the attack and blocked the attacker’s access. There is currently no indication that hackers accessed systems supporting daily operations or disrupted university activities.\nThe university reported the incident to the Danish Data Protection Agency. It also said the breach falls within the scope of the General Data Protection Regulation (GDPR) and that it is taking the appropriate steps with the relevant regulators.\nStudents and staff whose data may have been exposed should be wary of unsolicited communications and verify requests independently. The university said it would provide further updates on the impact as soon as its internal investigation allows.\nFounded in 1479, the University of Copenhagen is Denmark’s oldest university and one of its leading research institutions. It has about 36,800 students and 10,700 employees, six faculties and more than 200 research centers."
+    }
+  ],
+  "research_notes": "### Key Factual Claims and Context:\n\n1. **Data Breach Affected 525,000 People**  \n   - The University of Copenhagen confirmed that hackers accessed a test environment containing personal data of 525,000 people.  \n   - An additional 20,000 staff and students had their PIN codes exposed in an update.  \n   **Citation**: [SOURCE 1], [SOURCE 2]\n\n2. **Date of Breach and Disclosure**  \n   - The breach was detected on **Tuesday, October 20, 2026**.  \n   - The university disclosed the breach on **Friday, October 23, 2026**.  \n   - An update was released on **Sunday, October 25, 2026**, adding the 20,000 additional individuals affected.  \n   **Citation**: [SOURCE 2]\n\n3. **Nature of the Breach**  \n   - Hackers accessed a **test environment**, which is typically used for development or testing, not for storing live or sensitive data.  \n   - The university confirmed it has **contained the attack** and **blocked the attacker’s access**.  \n   - There is **no indication** that systems supporting **daily operations** were accessed or disrupted.  \n   **Citation**: [SOURCE 1], [SOURCE 2]\n\n4. **Exposed Information**  \n   - The following information may have been exposed:  \n     - Full names  \n     - National identity numbers (CPR)  \n     - Phone numbers  \n     - Email addresses  \n   - PIN codes were also exposed for 20,000 individuals.  \n   **Citation**: [SOURCE 1]\n\n5. **Response Measures**  \n   - The university **restricted physical access** to certain critical locations on campus as a precaution.  \n   - It is **gradually reopening** these locations as it distributes new access codes.  \n   - The university has **reported the incident** to the **Danish Data Protection Agency** and stated it falls under the **General Data Protection Regulation (GDPR)**.  \n   **Citation**: [SOURCE 1], [SOURCE 2]\n\n6. **Impact and Recommendations**  \n   - The exposed information increases the **risk of phishing and social engineering attacks**.  \n   - Students and staff are advised to be **cautious of unsolicited communications** and to **independently verify requests**.  \n   **Citation**: [SOURCE 1], [SOURCE 2]\n\n7. **University Background**  \n   - The University of Copenhagen is **Denmark’s oldest university**, founded in **1479**.  \n   - It has approximately **36,800 students** and **10,700 employees**, with **six faculties** and **more than 200 research centers**.  \n   **Citation**: [SOURCE 1], [SOURCE 2]\n\n---\n\n### Uncertainty and Missing Independent Confirmation:\n\n- **Exact Timeline of Events**: While the dates of detection, disclosure, and updates are provided, they are **not independently confirmed**.  \n- **Scope of Data Exposure**: The university states it is still **investigating the extent of the incident**, and the **exact data fields** that were exposed are **not fully confirmed**.  \n- **Impact on Daily Operations**: The university claims there is **no indication** that systems supporting daily operations were accessed or disrupted, but this is **not independently verified**.  \n- **Internal Investigation Outcomes**: The university has **not yet released the full results** of its internal investigation, and **no further updates** have been independently confirmed.  \n\n**Note**: Since only one source is present (with the second source being a duplicate of the first), **independent confirmation is missing** for all claims. The information provided is based on **untrusted source material**.",
+  "models": [
+    "qwen3:8b",
+    "qwen3:14b"
+  ],
+  "review_required": true,
+  "source_provenance": [
+    {
+      "url": "https://www.bleepingcomputer.com/news/security/university-of-copenhagen-data-breach-exposes-data-of-525-000-people/",
+      "domain": "bleepingcomputer.com",
+      "explicitly_attributes_to": [],
+      "provenance": "unverified",
+      "note": "No explicit attribution detected does not establish independence."
+    },
+    {
+      "url": "https://mezha.net/eng/news/mezha-72db9700e13ec246bc7cbf1b_university_of_copenhagen/",
+      "domain": "mezha.net",
+      "explicitly_attributes_to": [
+        "bleepingcomputer.com"
+      ],
+      "provenance": "downstream",
+      "note": "No explicit attribution detected does not establish independence."
+    }
+  ],
+  "claim_ledger": [
+    {
+      "claim": "The University of Copenhagen confirmed a data breach affecting 525,000 people.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "Hackers accessed a test environment containing personal data of 525,000 people.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The breach was detected on October 20, 2026, and disclosed on October 23, 2026.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "An additional 20,000 staff and students had their PIN codes exposed in an update on October 25, 2026.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The University of Copenhagen is still investigating the extent of the breach.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The breach may have exposed full names, national identity numbers, phone numbers, and email addresses.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The university restricted physical access to some critical locations on campus as a precaution.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The university says it contained the attack and blocked the attacker’s access.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The breach falls within the scope of the General Data Protection Regulation (GDPR).",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The university reported the incident to the Danish Data Protection Agency.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "Students and staff are advised to be cautious of unsolicited communications and verify requests independently.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    },
+    {
+      "claim": "The university promised to provide more updates on the impact as its internal investigation allows.",
+      "source_ids": [
+        1,
+        2
+      ],
+      "status": "supported_by_source"
+    }
+  ],
+  "quality_report": "2026-10-27-university-of-copenhagen-data-breach-exposes-data-of-525-000-people-6d9d5e58.quality.json"
+}

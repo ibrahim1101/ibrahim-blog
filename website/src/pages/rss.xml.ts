@@ -1,0 +1,2 @@
+import rss from '@astrojs/rss'; import {allArticles,categories} from '../lib'; import type {APIContext} from 'astro';
+export async function GET(context:APIContext){const articles=await allArticles();return rss({title:'IbrahimBlog',description:'Technology, in context.',site:context.site!,items:articles.map(a=>({title:a.data.title,pubDate:a.data.published,description:a.data.description,link:`/articles/${a.id}/`,categories:[categories[a.data.category]]}))});}

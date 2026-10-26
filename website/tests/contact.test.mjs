@@ -1,0 +1,8 @@
+import {test} from 'node:test'; import assert from 'node:assert/strict'; import {onRequestPost} from '../functions/api/contact.js';
+const env={TURNSTILE_SECRET:'secret',CONTACT_WEBHOOK_URL:'https://delivery.example/message',CONTACT_WEBHOOK_TOKEN:'token'};
+function request(fields,origin='https://blog.example'){const form=new FormData();for(const [k,v] of Object.entries(fields)) form.set(k,v);return new Request('https://blog.example/api/contact',{method:'POST',headers:{origin},body:form});}
+const fields={name:'Reader',email:'reader@example.com',message:'A useful message about your story.', 'cf-turnstile-response':'proof'};
+test('contact fails closed when secrets are missing',async()=>{assert.equal((await onRequestPost({request:request(fields),env:{}})).status,503)});
+test('contact rejects cross-origin requests',async()=>{assert.equal((await onRequestPost({request:request(fields,'https://elsewhere.example'),env})).status,403)});
+test('contact validates challenge and delivers only on success',async()=>{const original=globalThis.fetch;let calls=[];globalThis.fetch=async(url,opts)=>{calls.push([url,opts]);return String(url).includes('siteverify')?Response.json({success:true,hostname:'blog.example'}):new Response('OK')};try{assert.equal((await onRequestPost({request:request(fields),env})).status,200);assert.equal(calls.length,2);assert.equal(JSON.parse(calls[1][1].body).email,fields.email)}finally{globalThis.fetch=original}});
+test('failed challenge never delivers',async()=>{const original=globalThis.fetch;let count=0;globalThis.fetch=async()=>{count++;return Response.json({success:false})};try{assert.equal((await onRequestPost({request:request(fields),env})).status,403);assert.equal(count,1)}finally{globalThis.fetch=original}});

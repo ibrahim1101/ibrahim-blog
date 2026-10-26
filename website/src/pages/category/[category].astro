@@ -1,0 +1,7 @@
+---
+import Base from '../../layouts/Base.astro';
+import {allArticles,categories,fmt} from '../../lib';
+export function getStaticPaths(){return Object.keys(categories).map(category=>({params:{category}}))}
+const category=Astro.params.category as keyof typeof categories; const articles=(await allArticles()).filter(x=>x.data.category===category); const title=categories[category];
+---
+<Base title={title} description={`Reporting and analysis about ${title}.`}><div class="wrap listing"><div class="eyebrow">Explore / {title}</div><h1>{title}</h1><p class="hero-copy">Stories, developments and perspectives worth your attention.</p><div class="section"><div class="section-title"><h2>Stories</h2><span class="eyebrow">{articles.length} published</span></div>{articles.length ? <div class="grid">{articles.map(a=><article class="card"><div class="meta">{fmt(a.data.published)}</div><h3><a href={`/articles/${a.id}/`}>{a.data.title}</a></h3><p>{a.data.description}</p><a href={`/articles/${a.id}/`}>Read story ↗</a></article>)}</div>:<p class="empty">No stories in this section yet. Check back soon.</p>}</div></div></Base>
