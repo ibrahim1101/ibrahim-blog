@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+.env
+drafts/
+data/history.json
+.venv/
+website/node_modules/
+website/dist/
+website/.astro/
+data/*.sqlite3*
+.env
+website/.env
+backup-*/
+data/

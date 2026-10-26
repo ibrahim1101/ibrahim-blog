@@ -112,6 +112,11 @@ def discover(title):
     return leads
 
 
+def is_official_candidate(url):
+    # Domain ownership signals a possible primary statement, never proof of its role or accuracy.
+    host=domain(url)
+    return any(host == d or host.endswith('.'+d) for d in CONFIG.get('official_source_hosts', []))
+
 def gather_sources(primary, candidates, max_sources=3):
     docs = [primary]
     seen_domains = {domain(primary['url'])}
@@ -218,14 +223,14 @@ def main():
             trial = {**item, 'url': final_url, 'text': body,
                      'outbound_links': outbound}
             docs = gather_sources(trial, candidates)
-            if len({domain(d['url']) for d in docs}) >= 2:
+            if len({domain(d['url']) for d in docs}) >= 2 or is_official_candidate(final_url):
                 primary, documents = trial, docs
                 break
             print('Skipping single-source topic:', item['title'], flush=True)
         except Exception as exc:
             print('Skipping:', item['title'], '—', exc, flush=True)
     if not primary:
-        sys.exit('NO_DRAFT: No topic had two retrievable, relevant source domains. '
+        sys.exit('NO_DRAFT: No topic had enough retrievable source material. '
                  'Nothing published or generated. Try another category later.')
     print('Selected:', primary['title'])
     for i, doc in enumerate(documents, 1):
@@ -252,12 +257,16 @@ def main():
         'Never invent claims, CVEs, benchmarks, quotes, or dates. If sources are thin, keep the article short. '
         'Use source links in Markdown for factual claims and a Sources section. No unsupported hype. '
         'Do not present a single-source report as independently verified.',
-        f'Write a 500–900 word Markdown draft on: {primary["title"]}. '
+        f'Write an appropriately concise Markdown draft on: {primary["title"]}. '
         'Include a descriptive H1, concise introduction, sections explaining confirmed facts and significance, '
         'uncertainties, and a Sources section with clickable original URLs. '
         'Avoid generic filler. Only use the following research notes and source excerpts.\n\n'
         f'RESEARCH NOTES:\n{research}\n\nSOURCES:\n{source_packet}',
         1700)
+    retrieved_at=dt.datetime.now(dt.timezone.utc).isoformat()
+    for d in documents:
+        d['retrieved_at']=retrieved_at
+        d['source_role']='official_candidate' if is_official_candidate(d['url']) else 'unverified'
     urls = [d['url'] for d in documents]
     # Ensure the output has traceable source links even if the model omits them.
     missing = [u for u in urls if u not in draft]
