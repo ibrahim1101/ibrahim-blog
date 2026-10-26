@@ -216,7 +216,7 @@ def main():
         sys.exit('No new eligible articles. Try another category or inspect config.json feeds.')
     primary = None
     documents = []
-    # Try multiple topics; a story without corroboration is not drafted.
+    # Try multiple topics. An official-host candidate may proceed as an attributed single-source draft.
     for item in candidates[:12]:
         try:
             body, final_url, outbound = get_page(item['url'])

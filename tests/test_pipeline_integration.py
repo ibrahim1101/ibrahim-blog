@@ -4,6 +4,11 @@ from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 import blog
 class PipelineIntegration(unittest.TestCase):
+ def test_official_host_policy_checks_domain_boundary(self):
+  with patch.dict(blog.CONFIG, {'official_source_hosts':['cisa.gov']}):
+   self.assertTrue(blog.is_official_candidate('https://www.cisa.gov/advisory'))
+   self.assertTrue(blog.is_official_candidate('https://alerts.cisa.gov/advisory'))
+   self.assertFalse(blog.is_official_candidate('https://cisa.gov.attacker.example/advisory'))
  def test_mocked_research_to_local_review_never_publishes(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp); one={'title':'Fixture vendor advisory','url':'https://vendor.example/story','published':'2026-01-01','feed':'fixture'}
