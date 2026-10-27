@@ -2,5 +2,6 @@
   "name": "ibrahimblog-contact-delivery",
   "main": "worker.mjs",
   "compatibility_date": "2026-10-21",
-  "send_email": [{ "name": "EMAIL" }]
+  "send_email": [{ "name": "EMAIL" }],
+  "ratelimits": [{ "name": "CONTACT_LIMITER", "namespace_id": "50084264", "simple": { "limit": 5, "period": 60 } }]
 }

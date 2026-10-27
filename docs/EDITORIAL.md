@@ -30,10 +30,21 @@ REVIEWED, NEEDS_REVISION and REJECTED are local audit notes, not authenticated a
 
 ## Create a draft pull request
 
-After reviewing or selecting a local draft, install and authenticate the GitHub CLI (`gh`) with the minimum necessary repository permissions. Start from a clean `main` checkout with `origin` pointing to the intended repository. This command creates a new branch, stages only the article, commits, pushes, and opens a **draft** PR; it never approves or merges:
+After reviewing or selecting a local draft, install and authenticate the GitHub CLI (`gh`) with the minimum necessary repository permissions. Use a checkout whose `origin` points to the intended repository. This command fetches `main`, creates a separate temporary worktree and branch, stages only the article, commits, pushes, and opens a **draft** PR; it never approves or merges:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\create_review_pr.py '<draft filename>.md' --title 'Story title' --description 'Accurate summary' --category cyber --date '2026-10-27' --repo ibrahim1101/ibrahim-blog
 ```
 
-Public repositories expose PR contents and possibly preview deployments. The command refuses public repositories unless the operator explicitly adds `--allow-public`. Evidence JSON remains local. This PR creation is manually invoked; the scheduler does not automatically send drafts to GitHub. If any step fails, inspect the branch and working tree before retrying. A public PR or a CI pass does not represent editorial approval.
+Public repositories expose PR contents and possibly preview deployments. The command refuses public repositories unless the operator explicitly adds `--allow-public`. Evidence JSON remains local. The scheduler can invoke this command automatically when configured; its public-repository guard remains in force. If any step fails, inspect the branch and working tree before retrying. A public PR or a CI pass does not represent editorial approval.
+
+Website builds reject raw HTML and obvious unsafe link schemes in article Markdown, and source metadata is restricted to HTTP(S). These checks reduce risk but do not replace editorial review or a security audit.
+
+## Request further work
+
+```powershell
+.\.venv\Scripts\python.exe scripts\editor.py research '<draft filename>.md'
+.\.venv\Scripts\python.exe scripts\editor.py regenerate '<draft filename>.md'
+```
+
+`research` retrieves a fresh, separate evidence packet using the original source. Review that packet independently; it does not change the draft or automatically certify claims. `regenerate` runs the pipeline again for the original topic and creates new draft and report files rather than replacing the original. Both require network access; regeneration also requires local Ollama.

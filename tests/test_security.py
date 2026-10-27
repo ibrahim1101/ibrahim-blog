@@ -29,4 +29,19 @@ class SecurityTests(unittest.TestCase):
             return ['8.8.8.8']
         with patch('safe_fetch.resolve_public',side_effect=dns),patch('safe_fetch.PinnedHTTPS',Connection):
             with self.assertRaises(ValueError): safe_fetch.fetch('https://example.com/start')
+    def test_redirect_checks_each_url_before_connecting(self):
+        class Response:
+            def __init__(self,redirect): self.status=302 if redirect else 200;self.redirect=redirect
+            def getheader(self,name,default=None): return 'https://other.example/article' if name=='Location' else 'text/html' if name=='Content-Type' else default
+            def read(self,*args): return b'body'
+        class Connection:
+            count=0
+            def __init__(self,*a): pass
+            def request(self,*a,**kw): pass
+            def getresponse(self): Connection.count+=1;return Response(Connection.count==1)
+            def close(self): pass
+        visited=[]
+        with patch('safe_fetch.resolve_public',return_value=['8.8.8.8']),patch('safe_fetch.PinnedHTTPS',Connection):
+            safe_fetch.fetch('https://example.com/start',before_request=visited.append)
+        self.assertEqual(visited,['https://example.com/start','https://other.example/article'])
 if __name__=='__main__': unittest.main()

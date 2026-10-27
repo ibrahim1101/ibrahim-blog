@@ -7,7 +7,9 @@
   "feeds": {
     "ai": [
       "https://huggingface.co/blog/feed.xml",
-      "https://blog.google/technology/ai/rss/"
+      "https://blog.google/technology/ai/rss/",
+      "https://openai.com/news/rss.xml",
+      "https://feeds.arstechnica.com/arstechnica/index"
     ],
     "cyber": [
       "https://www.cisa.gov/cybersecurity-advisories/all.xml",
@@ -15,11 +17,14 @@
     ],
     "gaming": [
       "https://store.steampowered.com/feeds/news.xml",
-      "https://www.pcgamer.com/rss/"
+      "https://www.pcgamer.com/rss/",
+      "https://blog.playstation.com/feed/",
+      "https://blogs.nvidia.com/feed/"
     ],
     "dev": [
       "https://github.blog/feed/",
-      "https://devblogs.microsoft.com/python/feed/"
+      "https://devblogs.microsoft.com/python/feed/",
+      "https://kubernetes.io/feed.xml"
     ]
   },
   "official_source_hosts": [
@@ -28,12 +33,20 @@
     "devblogs.microsoft.com",
     "huggingface.co",
     "blog.google",
-    "store.steampowered.com"
+    "store.steampowered.com",
+    "openai.com",
+    "blog.playstation.com",
+    "blogs.nvidia.com",
+    "kubernetes.io"
   ],
   "schedule": {
     "timezone": "Asia/Kolkata",
     "draft_time": "10:00",
     "lookback_days": 7,
-    "retry_failed": false
-  }
+    "retry_failed": false,
+    "automatic_draft_pr": true,
+    "allow_public_draft_pr": false,
+    "repository": "ibrahim1101/ibrahim-blog"
+  },
+  "source_request_interval_seconds": 1.0
 }

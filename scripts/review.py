@@ -4,6 +4,7 @@ SENTENCE = re.compile(r'(?<=[.!?])\s+(?=[A-Z0-9])')
 UNCERTAIN = re.compile(r'\b(may|might|could|possibly|possible|alleged|reportedly|no indication|not known|unconfirmed)\b', re.I)
 NUMBERS = re.compile(r'(?i)\bCVE-\d{4}-\d{4,}\b|\b\d+(?:[.,]\d+)*(?:\s*(?:%|million|billion))?')
 QUOTES = re.compile(r'[“"]([^”"\n]{12,})[”"]')
+NEGATION = re.compile(r'\b(?:not|never|no|without|neither|nor)\b', re.I)
 PROMO = re.compile(r'(?i)\b(sponsored content|advertisement|download (?:the|our) report|sign up for (?:our|the) newsletter)\b')
 
 def sentences(text):
@@ -35,6 +36,7 @@ def review_article(draft, documents):
             sn={x.lower().strip() for x in NUMBERS.findall(passage)}
             if cn-sn: flags.append('numbers or identifiers not present in matched passage')
             if UNCERTAIN.search(passage) and not UNCERTAIN.search(claim): flags.append('possible certainty inflation')
+            if bool(NEGATION.search(passage)) != bool(NEGATION.search(claim)): flags.append('possible contradiction or negation mismatch')
         else: flags.append('no candidate passage found')
         for quote in QUOTES.findall(claim):
             if quote.lower() not in all_text: flags.append('quotation not found verbatim in retrieved text')
