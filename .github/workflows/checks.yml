@@ -11,11 +11,11 @@ jobs:
         with: {python-version: '3.12'}
       - run: pip install -r requirements.txt
       - run: python tests.py
-      - run: python -m unittest discover -s tests -v
       - uses: actions/setup-node@v4
         with: {node-version: '24', cache: 'npm', cache-dependency-path: 'website/package-lock.json'}
       - run: npm ci
         working-directory: website
+      - run: python -m unittest discover -s tests -v
       - run: npm test
         working-directory: website
       - run: python scripts/test_fixture.py

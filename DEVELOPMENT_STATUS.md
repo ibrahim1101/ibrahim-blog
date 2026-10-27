@@ -15,3 +15,5 @@ Additional implementation: a local evidence-bound editorial audit trail, attribu
 The local candidate queue supports collection, selection, rejection and draft generation with exact-URL deduplication; it groups similar headlines conservatively and does not establish source independence.
 
 Automatic draft PR preparation is configurable and uses an isolated worktree; public draft PR exposure is disabled by default. Ambiguous interruptions are not automatically retried. The optional Windows task installer and real GitHub PR creation have not been run on the user’s PC.
+
+An offline end-to-end fixture exercises mocked discovery and model output, local evidence/review, actual isolated Git worktree creation, mocked GitHub PR submission, and a real static article build. It does not test the real external services or prove factual accuracy.
