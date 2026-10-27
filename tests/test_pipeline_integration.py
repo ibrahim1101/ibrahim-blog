@@ -16,6 +16,7 @@ class PipelineIntegration(unittest.TestCase):
    other={'title':'Fixture independent report','url':'https://news.example/story','published':'2026-01-01','text':text}
    with patch.object(blog,'ROOT',root),patch.object(blog,'collect',return_value=[one]),patch.object(blog,'get_page',return_value=(text,one['url'],[])),patch.object(blog,'gather_sources',side_effect=lambda primary,candidates:[primary,other]),patch.object(blog,'ask',side_effect=['Vendor said 50 may be affected [SOURCE 1].','# Fixture vendor advisory\n\nThe vendor said 50 devices may be affected.\n\n## Sources\nhttps://vendor.example/story\nhttps://news.example/story','[]']),patch.object(sys,'argv',['blog.py','--category','cyber','--job-id','2026-10-26']):blog.main()
    self.assertTrue((root/'data'/'story-history.json').is_file())
+   evidence=json.loads(next((root/'drafts').glob('*.research.json')).read_text());self.assertTrue(all(x.get('canonical_url') and x.get('retrieved_at') for x in evidence['sources']))
    reports=list((root/'drafts').glob('*.quality.json'));self.assertEqual(len(reports),1)
    report=json.loads(reports[0].read_text());self.assertFalse(report['publication_allowed']);self.assertEqual(report['status'],'REVIEW_REQUIRED');self.assertTrue(report['article_claim_review']);self.assertFalse((root/'website').exists());from scheduler import completed_job;self.assertTrue(completed_job(root,'2026-10-26'))
 if __name__=='__main__':unittest.main()

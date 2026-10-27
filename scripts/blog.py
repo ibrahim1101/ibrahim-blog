@@ -88,8 +88,12 @@ class LinkCollector(HTMLParser):
                 self.links.append(href)
 
 
+def check_article_request(url):
+    if not source_policy(url)['enabled']:raise ValueError('source disabled by policy')
+    CRAWL_POLICY(url)
+
 def get_page(url):
-    raw, final, ctype = fetch(url,before_request=CRAWL_POLICY)
+    raw, final, ctype = fetch(url,before_request=check_article_request)
     if 'html' not in ctype.lower(): raise ValueError('Not an HTML page')
     html = raw.decode('utf-8', errors='replace')
     extracted = trafilatura.extract(html, include_comments=False, include_tables=False)
@@ -140,10 +144,20 @@ def discover(title):
     return leads
 
 
+def source_policy(url):
+    """Local editorial preferences; labels never certify a claim or independence."""
+    host=domain(url);policy={}
+    for suffix,value in sorted(CONFIG.get('source_policies',{}).items(),key=lambda pair:len(pair[0]),reverse=True):
+        if (host==suffix or host.endswith('.'+suffix)) and isinstance(value,dict):policy=value;break
+    role=policy.get('role','unverified')
+    if role not in ('official_candidate','secondary','unverified'):role='unverified'
+    if role=='unverified' and any(host==d or host.endswith('.'+d) for d in CONFIG.get('official_source_hosts',[])):role='official_candidate'
+    try:priority=max(0,min(100,int(policy.get('priority',50))))
+    except (TypeError,ValueError):priority=50
+    return {'role':role,'enabled':policy.get('enabled',True) is not False,'priority':priority}
+
 def is_official_candidate(url):
-    # Domain ownership signals a possible primary statement, never proof of its role or accuracy.
-    host=domain(url)
-    return any(host == d or host.endswith('.'+d) for d in CONFIG.get('official_source_hosts', []))
+    return source_policy(url)['role']=='official_candidate'
 
 def gather_sources(primary, candidates, max_sources=3):
     docs = [primary]
@@ -161,12 +175,12 @@ def gather_sources(primary, candidates, max_sources=3):
         if len(docs) >= max_sources:
             break
         url = item['url']
-        if url in seen_urls or domain(url) in seen_domains:
+        if url in seen_urls or domain(url) in seen_domains or not source_policy(url)['enabled']:
             continue
         seen_urls.add(url)
         try:
             body, final, links = get_page(url)
-            if domain(final) in seen_domains or not relevance(item['title'], body, primary['title']):
+            if not source_policy(final)['enabled'] or domain(final) in seen_domains or not relevance(item['title'], body, primary['title']):
                 continue
             docs.append({**item, 'url': final, 'text': body})
             seen_domains.add(domain(final))
@@ -182,6 +196,7 @@ def collect(category):
     cutoff = now - dt.timedelta(days=CONFIG.get('max_age_days', 14))
     items = []
     for feed_url in CONFIG['feeds'][category]:
+        if not source_policy(feed_url)['enabled']:continue
         print('Checking feed:', feed_url, flush=True)
         try:
             body, _, _ = fetch(feed_url)
@@ -198,12 +213,12 @@ def collect(category):
                     continue
                 link = e.get('link', '')
                 title = re.sub(r'\s+', ' ', e.get('title', '')).strip()
-                if title and valid_public_url(link):
-                    items.append({'title': title, 'url': link, 'published': published.isoformat(), 'feed': feed_url})
+                if title and valid_public_url(link) and source_policy(link)['enabled']:
+                    items.append({'title': title, 'url': link, 'published': published.isoformat(), 'feed': feed_url, 'priority':source_policy(feed_url)['priority']})
         except Exception as exc:
             print('  Warning: feed unavailable:', exc, file=sys.stderr)
     unique = {i['url']: i for i in items}
-    return sorted(unique.values(), key=lambda x: x['published'], reverse=True)
+    return sorted(unique.values(), key=lambda x:(x['published'][:10],x.get('priority',50),x['published']),reverse=True)
 
 
 def ask(model, system, user, max_predict):
@@ -254,7 +269,7 @@ def main():
             print(x['published'][:10], x['title'], x['url'])
         print(f'Found {len(items)} recent entries')
         return
-    candidates = [i for i in items if args.force or (canonical_url(i['url']) not in known and not any(isinstance(x,dict) and similar(i['title'],str(x.get('title',''))) for x in story_history))]
+    candidates = [i for i in items if source_policy(i['url'])['enabled'] and (args.force or (canonical_url(i['url']) not in known and not any(isinstance(x,dict) and similar(i['title'],str(x.get('title',''))) for x in story_history)))]
     if not candidates:
         sys.exit('No new eligible articles. Try another category or inspect config.json feeds.')
     primary = None
@@ -263,6 +278,7 @@ def main():
     for item in candidates[:12]:
         try:
             body, final_url, outbound = get_page(item['url'])
+            if not source_policy(final_url)['enabled']:continue
             trial = {**item, 'url': final_url, 'text': body,
                      'outbound_links': outbound}
             docs = gather_sources(trial, candidates)
@@ -309,7 +325,10 @@ def main():
     retrieved_at=dt.datetime.now(dt.timezone.utc).isoformat()
     for d in documents:
         d['retrieved_at']=retrieved_at
-        d['source_role']='official_candidate' if is_official_candidate(d['url']) else 'unverified'
+        d['canonical_url']=canonical_url(d['url'])
+        d['canonical_status']='normalized_not_verified'
+        d['source_policy']=source_policy(d['url'])
+        d['source_role']=d['source_policy']['role']
     urls = [d['url'] for d in documents]
     # Ensure the output has traceable source links even if the model omits them.
     missing = [u for u in urls if u not in draft]

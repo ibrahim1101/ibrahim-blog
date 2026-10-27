@@ -59,3 +59,13 @@ For a weekly roundup, select two to four existing draft filenames with their evi
 ```
 
 The roundup is a new review-required draft and uses the selected stories’ local source evidence. It never automatically publishes or independently verifies the sources.
+
+## Dependency audits and URL records
+
+To audit the pinned Python dependencies, install the `pip-audit` tool separately and run `python -m pip_audit -r requirements-lock.txt`. For the site, run `npm --prefix website audit --omit=dev`. Audits are point-in-time checks; review update PRs and rerun validation before deployment.
+
+Each retrieved source records its retrieval timestamp, final fetched URL and a normalized URL with common tracking parameters removed. The normalized URL is marked `normalized_not_verified`: it is not an independently verified publisher-declared canonical URL. Failed secondary-source fetches are recorded by domain and error type, without treating missing sources as corroboration.
+
+## Source preferences
+
+The `source_policies` entries in `config.json` support `enabled`, `role` (`official_candidate`, `secondary`, or `unverified`) and a 0–100 priority. The most specific matching domain wins. Disabled sources are blocked before article requests, including redirects. Freshness takes precedence over source priority; the priority is an editorial preference within the same date, not a factual reliability score. An official-domain match only identifies a possible primary source and must be verified by the editor. Unknown domains remain unverified.

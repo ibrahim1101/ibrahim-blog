@@ -1,0 +1,48 @@
+name: Editorial gate
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+permissions:
+  actions: read
+  contents: read
+  pull-requests: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    outputs:
+      article_changed: ${{ steps.detect.outputs.article_changed }}
+    steps:
+      # Only the trusted base revision is checked out. Never execute PR code here.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - name: Detect article changes and verify review configuration
+        id: detect
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/pr-meta.json"
+          head="$(jq -r '.head.sha' "$RUNNER_TEMP/pr-meta.json")"
+          count="$(jq -r '.changed_files' "$RUNNER_TEMP/pr-meta.json")"
+          [ "$head" = "$EXPECTED_HEAD" ] || { echo 'PR head changed; retry the check' >&2; exit 1; }
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" > "$RUNNER_TEMP/pr-files.json"
+          head_after="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.head.sha')"
+          [ "$head_after" = "$EXPECTED_HEAD" ] || { echo 'PR head changed during inspection' >&2; exit 1; }
+          changed="$(python3 scripts/approval_gate.py files "$RUNNER_TEMP/pr-files.json" --changed-count "$count")"
+          echo "article_changed=$changed" >> "$GITHUB_OUTPUT"
+          if [ "$changed" = true ]; then
+            gh api "repos/$GITHUB_REPOSITORY/environments/editorial" > "$RUNNER_TEMP/editorial-environment.json"
+            python3 scripts/approval_gate.py environment "$RUNNER_TEMP/editorial-environment.json" --owner "$REPO_OWNER"
+          fi
+  approval:
+    needs: inspect
+    if: needs.inspect.outputs.article_changed == 'true'
+    runs-on: ubuntu-latest
+    environment: editorial
+    steps:
+      - run: echo 'The configured GitHub environment reviewer approved this workflow run.'
