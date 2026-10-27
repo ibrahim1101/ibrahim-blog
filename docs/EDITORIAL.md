@@ -27,3 +27,13 @@ After checking the draft and its evidence, record an advisory local decision:
 ```
 
 REVIEWED, NEEDS_REVISION and REJECTED are local audit notes, not authenticated approval or a publish command. The status returns to REVIEW_REQUIRED when the draft, research evidence or quality report changes. The append-only event list is local SQLite and is not tamper-proof. GitHub permissions and branch protection are still required for publication.
+
+## Create a draft pull request
+
+After reviewing or selecting a local draft, install and authenticate the GitHub CLI (`gh`) with the minimum necessary repository permissions. Start from a clean `main` checkout with `origin` pointing to the intended repository. This command creates a new branch, stages only the article, commits, pushes, and opens a **draft** PR; it never approves or merges:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\create_review_pr.py '<draft filename>.md' --title 'Story title' --description 'Accurate summary' --category cyber --date '2026-10-27' --repo ibrahim1101/ibrahim-blog
+```
+
+Public repositories expose PR contents and possibly preview deployments. The command refuses public repositories unless the operator explicitly adds `--allow-public`. Evidence JSON remains local. This PR creation is manually invoked; the scheduler does not automatically send drafts to GitHub. If any step fails, inspect the branch and working tree before retrying. A public PR or a CI pass does not represent editorial approval.
