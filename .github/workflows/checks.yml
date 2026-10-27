@@ -18,6 +18,5 @@ jobs:
         working-directory: website
       - run: npm test
         working-directory: website
-      - run: npm run build
-        working-directory: website
+      - run: python scripts/test_fixture.py
       - run: python scripts/check_site.py

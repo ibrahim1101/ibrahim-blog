@@ -19,6 +19,7 @@ import trafilatura
 from editorial import clean_extraction, quality_report, source_provenance, domain
 from review import review_article
 from safe_fetch import fetch
+from story_cluster import canonical_url, similar
 from urllib.parse import quote_plus, urljoin, urlsplit
 from html.parser import HTMLParser
 
@@ -215,7 +216,10 @@ def main():
     if args.job_id and not re.fullmatch(r'\d{4}-\d{2}-\d{2}',args.job_id): ap.error('invalid job id')
     history_path = ROOT / 'data' / 'history.json'
     history = json.loads(history_path.read_text(encoding='utf-8')) if history_path.exists() else []
-    known = set(history)
+    known = {canonical_url(u) for u in history if isinstance(u,str)}
+    story_history_path=ROOT/'data'/'story-history.json'
+    story_history=json.loads(story_history_path.read_text(encoding='utf-8')) if story_history_path.exists() else []
+    if not isinstance(story_history,list): raise ValueError('Invalid story history')
     if args.url:
         if not valid_public_url(args.url):
             sys.exit('Invalid URL')
@@ -228,7 +232,7 @@ def main():
             print(x['published'][:10], x['title'], x['url'])
         print(f'Found {len(items)} recent entries')
         return
-    candidates = [i for i in items if args.force or i['url'] not in known]
+    candidates = [i for i in items if args.force or (canonical_url(i['url']) not in known and not any(isinstance(x,dict) and similar(i['title'],str(x.get('title',''))) for x in story_history))]
     if not candidates:
         sys.exit('No new eligible articles. Try another category or inspect config.json feeds.')
     primary = None
@@ -339,7 +343,9 @@ def main():
     header = f'<!-- DRAFT ONLY — HUMAN FACT CHECK REQUIRED. Evidence: {research_file.name} -->\n\n'
     atomic_text(draft_file,header + draft + '\n')
     history_path.parent.mkdir(exist_ok=True)
-    atomic_text(history_path,json.dumps(sorted(known | {primary['url']}), indent=2))
+    atomic_text(history_path,json.dumps(sorted(known | {canonical_url(primary['url'])}), indent=2))
+    story_history.append({'title':primary['title'],'url':canonical_url(primary['url']),'generated_at':dt.datetime.now(dt.timezone.utc).isoformat()})
+    atomic_text(story_history_path,json.dumps(story_history,indent=2,ensure_ascii=False))
     if args.job_id:
         files=[draft_file,research_file,quality_file]
         manifest={'job_id':args.job_id,'files':[{'name':p.name,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in files]}

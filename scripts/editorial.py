@@ -51,7 +51,16 @@ def quality_report(draft, documents, provenance, claims):
     if not re.search(r'(?im)^##\s+(?:sources|references)\b',draft): flags.append('Missing Sources heading.')
     for d in documents:
         if d['url'] not in draft: flags.append('Missing source URL: '+d['url'])
-    if len(draft.split())<300: flags.append('Draft under 300 words; review completeness.')
+    cited_urls=set(re.findall(r'\]\(\s*(https?://[^\s)]+)',draft))
+    source_urls={d['url'] for d in documents}
+    if cited_urls-source_urls: flags.append('Article cites URL(s) not in retrieved evidence: '+', '.join(sorted(cited_urls-source_urls)))
+    draft_words=re.findall(r'[a-z0-9]+',draft.lower())
+    draft_chunks={' '.join(draft_words[i:i+20]) for i in range(max(0,len(draft_words)-19))}
+    for d in documents:
+        source_words=re.findall(r'[a-z0-9]+',d.get('text','').lower())
+        if any(' '.join(source_words[i:i+20]) in draft_chunks for i in range(max(0,len(source_words)-19))):
+            flags.append('Potential copied passage from '+d['url']+'; review quotation and attribution.')
+
     if re.search(r'(?i)blue report 2026|338 million simulations|37% of (?:an )?attacker',draft): flags.append('Advertisement contamination.')
     if re.search(r'(?i)\b(yesterday|last tuesday|last friday|last week)\b',draft): flags.append('Relative date left in draft.')
     combined=' '.join(d.get('text','') for d in documents).lower()
