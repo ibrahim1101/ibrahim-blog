@@ -309,6 +309,8 @@ def main():
     retrieved_at=dt.datetime.now(dt.timezone.utc).isoformat()
     for d in documents:
         d['retrieved_at']=retrieved_at
+        d['canonical_url']=canonical_url(d['url'])
+        d['canonical_status']='normalized_not_verified'
         d['source_role']='official_candidate' if is_official_candidate(d['url']) else 'unverified'
     urls = [d['url'] for d in documents]
     # Ensure the output has traceable source links even if the model omits them.
