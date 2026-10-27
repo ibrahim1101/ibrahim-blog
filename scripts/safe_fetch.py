@@ -28,13 +28,14 @@ def resolve_public(host, port):
     if not addresses or any(not ipaddress.ip_address(x).is_global for x in addresses): raise ValueError('non-public DNS answer denied')
     return addresses
 
-def fetch(url, *, timeout=25, limit=MAX_BYTES, redirects=5):
+def fetch(url, *, timeout=25, limit=MAX_BYTES, redirects=5, before_request=None):
     for _ in range(redirects + 1):
         u=urlsplit(url)
         if u.scheme not in ('http','https') or not u.hostname or u.username is not None or u.password is not None: raise ValueError('invalid public URL')
         port=u.port or (443 if u.scheme == 'https' else 80)
         if port not in (80,443): raise ValueError('nonstandard port denied')
         host=u.hostname
+        if before_request is not None: before_request(url)
         addresses=resolve_public(host,port)
         path=u.path or '/'
         if u.query: path += '?' + u.query

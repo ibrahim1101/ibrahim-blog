@@ -45,3 +45,17 @@ The queue is local SQLite and removes common tracking parameters before exact-UR
 The `schedule.automatic_draft_pr` setting enables draft PR creation after a complete scheduled draft. The PR command uses an isolated worktree and sends the article only; research JSON remains local. Git and authenticated `gh` must be installed on the PC. Because your repository is public, `schedule.allow_public_draft_pr` defaults to `false`: the PR attempt fails closed rather than expose a draft. Set it to `true` only if you want anyone to see drafts in public PRs and previews. A PR is never merged automatically.
 
 Each job gets one recorded PR attempt. To see states, run `scripts\scheduler.py --list`. If an attempt fails, inspect its branch, worktree and GitHub PRs before using `--retry-pr-failed`; a process killed during a PR attempt remains `running` and requires investigation to prevent duplicates. The scheduled placeholder publication date and all article content must be edited during human review.
+
+Article fetches consult `robots.txt` and apply process-local per-host pacing. A missing robots file is treated as allowing access; a denied or unavailable policy fails closed, including on redirects. Feed availability and site policies can change; configure sources responsibly. The policy is not a substitute for complying with each site’s terms.
+
+## Article formats and roundups
+
+Use `scripts\blog.py --category cyber --format advisory` to request a specific format. Supported formats are `news`, `breaking`, `advisory`, `explainer`, `product`, `release`, `hardware`, `gaming`, and `analysis`. The system adjusts the writing instruction; the format does not certify the facts.
+
+For a weekly roundup, select two to four existing draft filenames with their evidence files:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\roundup.py '<draft-1>.md' '<draft-2>.md' --category ai
+```
+
+The roundup is a new review-required draft and uses the selected stories’ local source evidence. It never automatically publishes or independently verifies the sources.

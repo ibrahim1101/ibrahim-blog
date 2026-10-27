@@ -19,6 +19,7 @@ import trafilatura
 from editorial import clean_extraction, quality_report, source_provenance, domain
 from review import review_article
 from safe_fetch import fetch
+from crawl_policy import CrawlPolicy
 from story_cluster import canonical_url, similar
 from urllib.parse import quote_plus, urljoin, urlsplit
 from html.parser import HTMLParser
@@ -27,7 +28,20 @@ ROOT = Path(__file__).resolve().parents[1]
 CONFIG = json.loads((ROOT / 'config.json').read_text(encoding='utf-8'))
 HEADERS = {'User-Agent': 'IbrahimBlogResearch/0.1 (personal blog draft; contact site owner)'}
 TIMEOUT = (10, 25)
+CRAWL_POLICY = CrawlPolicy(fetch, interval=CONFIG.get('source_request_interval_seconds',1.0))
 
+
+FORMATS = {
+ 'news':'standard evidence-led news report',
+ 'breaking':'brief breaking-news report emphasizing what remains unknown',
+ 'advisory':'security advisory with evidence-backed affected versions and mitigations',
+ 'explainer':'technical explainer, separating supported facts from clearly labeled analysis',
+ 'product':'product launch report distinguishing vendor claims from independent measurements',
+ 'release':'open-source release report grounded in official release notes',
+ 'hardware':'hardware analysis distinguishing announced specifications from measured results',
+ 'gaming':'gaming industry news report without speculative claims',
+ 'analysis':'clearly labeled editorial analysis with a transparent factual basis',
+}
 
 def atomic_text(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -75,7 +89,7 @@ class LinkCollector(HTMLParser):
 
 
 def get_page(url):
-    raw, final, ctype = fetch(url)
+    raw, final, ctype = fetch(url,before_request=CRAWL_POLICY)
     if 'html' not in ctype.lower(): raise ValueError('Not an HTML page')
     html = raw.decode('utf-8', errors='replace')
     extracted = trafilatura.extract(html, include_comments=False, include_tables=False)
@@ -206,6 +220,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--category', choices=CONFIG['feeds'].keys(), default='cyber')
     ap.add_argument('--list', action='store_true', help='List fresh headlines, no AI')
+    ap.add_argument('--format', choices=FORMATS, default='news', help='Draft format')
     ap.add_argument('--dry-run', action='store_true', help='Show selected sources, no AI')
     ap.add_argument('--url', help='Use one specific public article URL')
     ap.add_argument('--title', help='Story title for a supplied URL')
@@ -278,7 +293,7 @@ def main():
         'Never invent claims, CVEs, benchmarks, quotes, or dates. If sources are thin, keep the article short. '
         'Use source links in Markdown for factual claims and a Sources section. No unsupported hype. '
         'Do not present a single-source report as independently verified.',
-        f'Write an appropriately concise Markdown draft on: {primary["title"]}. '
+        f'Write an appropriately concise {FORMATS[args.format]} on: {primary["title"]}. '
         'Include a descriptive H1, concise introduction, sections explaining confirmed facts and significance, '
         'uncertainties, and a Sources section with clickable original URLs. '
         'Avoid generic filler. Only use the following research notes and source excerpts.\n\n'
@@ -334,7 +349,7 @@ def main():
     quality_file = outdir / f'{stem}.quality.json'
     primary.pop('outbound_links', None)
     evidence = {'generated_at': dt.datetime.now(dt.timezone.utc).isoformat(),
-                'category': args.category, 'primary': primary['url'],
+                'category': args.category, 'format':args.format, 'primary': primary['url'],
                 'sources': documents, 'research_notes': research,
                 'models': [CONFIG['research_model'], CONFIG['writer_model']],
                 'review_required': True, 'source_provenance': provenance, 'claim_ledger': claims, 'quality_report': quality_file.name}

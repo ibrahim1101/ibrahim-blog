@@ -3,6 +3,7 @@ import subprocess,sys,os
 from pathlib import Path
 NPM = 'npm.cmd' if os.name == 'nt' else 'npm'
 ROOT=Path(__file__).resolve().parents[1]; path=ROOT/'website/src/content/articles/fixture-test-only.md'
+path.parent.mkdir(parents=True,exist_ok=True)
 if path.exists(): raise SystemExit('Fixture file already exists; refusing to overwrite it')
 fixture='''---
 title: "Fixture story for build verification"
