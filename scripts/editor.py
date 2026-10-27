@@ -18,7 +18,7 @@ CATEGORIES={'ai','cyber','gaming','dev'}
 
 def selected(name):
     p=(DRAFTS/name).resolve()
-    if p.parent!=DRAFTS or p.suffix!='.md' or not p.is_file(): raise ValueError('Select an existing draft filename from drafts/')
+    if p.parent!=DRAFTS.resolve() or p.suffix!='.md' or not p.is_file(): raise ValueError('Select an existing draft filename from drafts/')
     return p
 
 def artifacts(p):
