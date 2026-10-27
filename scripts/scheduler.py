@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Persistent, draft-only scheduler. A failed or interrupted slot is never silently rerun."""
 import argparse,datetime as dt,hashlib,json,re,sqlite3,subprocess,sys
+from contextlib import closing
 from pathlib import Path
 from zoneinfo import ZoneInfo
 ROOT=Path(__file__).resolve().parents[1]
@@ -70,7 +71,7 @@ def main():
         if draft_time.tzinfo: raise ValueError('time must not contain a timezone')
     except (ValueError,KeyError) as e:p.error('invalid schedule configuration: '+str(e))
     now=dt.datetime.now(zone);(ROOT/'data').mkdir(exist_ok=True)
-    with sqlite3.connect(ROOT/'data'/'schedule.sqlite3',timeout=5) as db:
+    with closing(sqlite3.connect(ROOT/'data'/'schedule.sqlite3',timeout=5)) as db, db:
         db.execute('CREATE TABLE IF NOT EXISTS jobs (day TEXT PRIMARY KEY, category TEXT NOT NULL, state TEXT NOT NULL, updated TEXT NOT NULL)')
         db.execute("CREATE TABLE IF NOT EXISTS pr_jobs (day TEXT PRIMARY KEY, state TEXT NOT NULL, updated TEXT NOT NULL, detail TEXT NOT NULL)")
         for day,category in due_days(now.date(),args.lookback_days):

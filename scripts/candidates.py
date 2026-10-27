@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Local story queue. Discovery and generation never approve or publish content."""
 import argparse,datetime as dt,hashlib,json,sqlite3,subprocess,sys
+from contextlib import closing
 from pathlib import Path
 import blog
 from story_cluster import canonical_url, similar
@@ -28,7 +29,7 @@ def main():
  get=sub.add_parser('collect');get.add_argument('--category',choices=blog.CONFIG['feeds'],required=True)
  sub.add_parser('list');reject=sub.add_parser('reject');reject.add_argument('id');generate=sub.add_parser('generate');generate.add_argument('id')
  args=p.parse_args();(ROOT/'data').mkdir(exist_ok=True)
- with connect(ROOT/'data'/'candidates.sqlite3') as db:
+ with closing(connect(ROOT/'data'/'candidates.sqlite3')) as db, db:
   if args.command=='collect': print('New candidates:',add(db,args.category,blog.collect(args.category)));return 0
   if args.command=='list':
    for row in db.execute('SELECT id,state,category,published,title,url,cluster_id FROM candidates ORDER BY published DESC'): print(json.dumps(row,ensure_ascii=False))

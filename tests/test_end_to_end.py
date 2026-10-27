@@ -1,5 +1,6 @@
 """Offline integration: simulated sources/models and GitHub, actual Git and Astro."""
 import json,os,shutil,subprocess,sys,tempfile,unittest
+from contextlib import closing
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -21,7 +22,7 @@ class EndToEnd(unittest.TestCase):
    answer=['The vendor reports 50 devices may be affected [SOURCE 1].','# Fixture product security incident\n\nThe vendor says 50 devices may be affected.\n\n## Sources\nhttps://vendor.example/advisory\nhttps://news.example/coverage','[]']
    with patch.object(blog,'ROOT',root),patch.object(blog,'collect',return_value=[one]),patch.object(blog,'get_page',return_value=(source,one['url'],[])),patch.object(blog,'gather_sources',side_effect=lambda p,c:[p,second]),patch.object(blog,'ask',side_effect=answer),patch.object(sys,'argv',['blog.py','--category','cyber','--job-id','2026-10-26']):blog.main()
    draft=next((root/'drafts').glob('*.md'));quality=json.loads(next((root/'drafts').glob('*.quality.json')).read_text());self.assertFalse(quality['publication_allowed'])
-   with editorial_store.connect(root/'data/editorial.sqlite3') as db:editorial_store.transition(db,draft,'REVIEWED','Fixture editor','Checked fixture evidence')
+   with closing(editorial_store.connect(root/'data/editorial.sqlite3')) as db, db:editorial_store.transition(db,draft,'REVIEWED','Fixture editor','Checked fixture evidence')
    built=[]
    def runner(*args,capture=False,cwd=None):
     if args[:3]==('gh','repo','view'):return SimpleNamespace(stdout='{"isPrivate":true}')

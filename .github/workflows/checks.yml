@@ -25,3 +25,15 @@ jobs:
       - run: npm run build
         working-directory: website
       - run: python scripts/check_site.py
+  windows-checks:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.14'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: 'npm', cache-dependency-path: 'website/package-lock.json'}
+      - run: ./setup.ps1
+        shell: pwsh
+      - run: ./validate.ps1
+        shell: pwsh

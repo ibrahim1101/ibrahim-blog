@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Local editorial handoff. Never publishes, merges, or grants approval."""
 import argparse
+from contextlib import closing
 import datetime as dt
 import json
 import re
@@ -17,7 +18,7 @@ CATEGORIES={'ai','cyber','gaming','dev'}
 
 def selected(name):
     p=(DRAFTS/name).resolve()
-    if p.parent!=DRAFTS or p.suffix!='.md' or not p.is_file(): raise ValueError('Select an existing draft filename from drafts/')
+    if p.parent!=DRAFTS.resolve() or p.suffix!='.md' or not p.is_file(): raise ValueError('Select an existing draft filename from drafts/')
     return p
 
 def artifacts(p):
@@ -93,7 +94,7 @@ def main():
         return regenerate(selected(args.draft))
     elif args.cmd in ('decision','history'):
         p=selected(args.draft); artifacts(p); (ROOT/'data').mkdir(exist_ok=True)
-        with connect(ROOT/'data'/'editorial.sqlite3') as db:
+        with closing(connect(ROOT/'data'/'editorial.sqlite3')) as db, db:
             if args.cmd=='history':
                 print('Current:',state(db,p))
                 for row in db.execute('SELECT at,prior_state,state,actor,note,content_sha256 FROM review_events WHERE draft=? ORDER BY id',(p.name,)):print(json.dumps(row,ensure_ascii=False))
