@@ -45,7 +45,9 @@ def quality_report(draft, documents, provenance, claims):
     downstream=[p for p in provenance if p['explicitly_attributes_to']]
     if downstream: flags.append('Source dependency: one publication explicitly attributes reporting to another collected publication.')
     if any(p.get('potential_syndication') for p in provenance): flags.append('Potential syndication or shared passages require manual inspection.')
-    if not any(p['provenance']=='verified_primary' for p in provenance): flags.append('No independently verified official primary statement collected.')
+    if not any(p['provenance']=='verified_primary' for p in provenance):
+        if any(d.get('source_role')=='official_candidate' for d in documents): flags.append('Official-source candidate found; manually verify that it is the original primary statement.')
+        else: flags.append('No independently verified official primary statement collected.')
     if len(documents)<2: flags.append('Only one retrievable source.')
     if not re.search(r'(?m)^#\s+\S',draft): flags.append('Missing H1.')
     if not re.search(r'(?im)^##\s+(?:sources|references)\b',draft): flags.append('Missing Sources heading.')

@@ -25,7 +25,7 @@ The `schedule` section of `config.json` sets the time zone, draft time, lookback
 
 ## Backup and maintenance
 
-Back up `config.json`, `drafts/`, and `data/` regularly while the scheduler is stopped. SQLite backups should use SQLite's backup API or a cleanly stopped process. Restore those files into a fresh installation. Never commit draft evidence, private credentials, databases, or the virtual environment. Update dependencies deliberately and run validation after updates. The included Python and npm dependency constraints are not a substitute for vulnerability monitoring.
+Create a local backup with `.\.venv\Scripts\python.exe scripts\backup.py`. It saves configuration, drafts and state into a new ZIP under `backups/`, uses SQLite’s backup API, excludes logs, and never overwrites an existing ZIP. Stop the scheduler while backing up so related files represent the same point in time. Store the archive privately, as it contains drafts and research. To restore, extract into a separate empty directory, compare its contents, then copy the desired files into a stopped installation without overwriting newer work. Never commit draft evidence, private credentials, databases, or the virtual environment. Update dependencies deliberately and run validation after updates. The included Python and npm dependency constraints are not a substitute for vulnerability monitoring.
 
 ## Candidate queue
 

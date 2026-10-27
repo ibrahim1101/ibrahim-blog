@@ -12,3 +12,4 @@ data/*.sqlite3*
 website/.env
 backup-*/
 data/
+backups/
