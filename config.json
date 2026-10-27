@@ -48,5 +48,32 @@
     "allow_public_draft_pr": false,
     "repository": "ibrahim1101/ibrahim-blog"
   },
-  "source_request_interval_seconds": 1.0
+  "source_request_interval_seconds": 1.0,
+  "source_policies": {
+    "cisa.gov": {
+      "enabled": true,
+      "role": "official_candidate",
+      "priority": 85
+    },
+    "bleepingcomputer.com": {
+      "enabled": true,
+      "role": "secondary",
+      "priority": 65
+    },
+    "huggingface.co": {
+      "enabled": true,
+      "role": "official_candidate",
+      "priority": 75
+    },
+    "github.blog": {
+      "enabled": true,
+      "role": "official_candidate",
+      "priority": 75
+    },
+    "pcgamer.com": {
+      "enabled": true,
+      "role": "secondary",
+      "priority": 60
+    }
+  }
 }
