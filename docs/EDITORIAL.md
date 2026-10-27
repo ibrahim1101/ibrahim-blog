@@ -48,3 +48,11 @@ Website builds reject raw HTML and obvious unsafe link schemes in article Markdo
 ```
 
 `research` retrieves a fresh, separate evidence packet using the original source. Review that packet independently; it does not change the draft or automatically certify claims. `regenerate` runs the pipeline again for the original topic and creates new draft and report files rather than replacing the original. Both require network access; regeneration also requires local Ollama.
+
+## GitHub owner approval gate
+
+The `Editorial gate` workflow inspects article changes using the trusted base-branch workflow and code, not PR code. When an article or the gate itself changes, it fails closed unless a GitHub environment named `editorial` is configured with **only the repository owner** as a required reviewer and self-review is allowed. After configuration, that owner's explicit approval of the environment job is required for the approval job to complete. It does not itself publish or merge an article.
+
+This is not enforced by merely committing the workflow. In GitHub repository settings, create the `editorial` environment, configure its required reviewer as the owner, leave self-review enabled, and disable administrative bypass where available. In the `main` branch rules, prohibit direct pushes and bypass, require the `Editorial gate` inspect **and** approval checks plus the validation check, and require the branch to be up to date. Check the exact check names displayed by GitHub. Protect changes to workflows and branch rules from untrusted writers. Restrict Cloudflare production deployments to the protected `main` branch and protect previews containing drafts. GitHub plan and ruleset availability can affect these settings.
+
+Before using this as a publication safeguard, test a fictional draft PR: verify it fails with no environment configuration, waits for the owner's explicit review when configured, and cannot merge before approval. Re-run after changing account settings. The configuration, actual approval prompt and enforcement have not been verified by this project; a repository administrator can change rules, and unprotected `main` remains bypassable.
