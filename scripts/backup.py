@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Create a local non-overwriting backup of configuration, drafts and state."""
 import argparse,datetime as dt,os,sqlite3,tempfile,zipfile
+from contextlib import closing
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -21,7 +22,7 @@ def make_backup(root,destination):
      if path.name.endswith(('-wal','-shm','-journal')) or rel.parts[:2]==('data','logs'):continue
      if path.suffix=='.sqlite3':
       snapshot=Path(tmp)/(str(len(z.infolist()))+'.sqlite3')
-      with sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True) as source, sqlite3.connect(snapshot) as dest:source.backup(dest)
+      with closing(sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True)) as source, closing(sqlite3.connect(snapshot)) as dest:source.backup(dest)
       z.write(snapshot,rel.as_posix())
      else:z.write(path,rel.as_posix())
   except BaseException:
