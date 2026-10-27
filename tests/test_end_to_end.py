@@ -11,6 +11,7 @@ class EndToEnd(unittest.TestCase):
  def test_discovery_to_review_pr_and_static_build(self):
   with tempfile.TemporaryDirectory() as tmp:
    root=Path(tmp)/'project';root.mkdir();shutil.copytree(ROOT/'website',root/'website',ignore=shutil.ignore_patterns('node_modules','dist','.astro'))
+   baseline_articles={p.relative_to(root/'website/src/content/articles') for p in (root/'website/src/content/articles').rglob('*.md')}
    (root/'.gitignore').write_text('drafts/\ndata/\nwebsite/node_modules/\nwebsite/.astro/\nwebsite/dist/\n')
    def git(*args):return subprocess.run(['git',*args],cwd=root,check=True,capture_output=True,text=True)
    git('init','-b','main');git('config','user.name','Fixture Editor');git('config','user.email','fixture@example.invalid');git('add','.');git('commit','-m','fixture baseline');git('remote','add','origin','https://github.com/fixture/blog.git');git('update-ref','refs/remotes/origin/main','HEAD')
@@ -27,7 +28,7 @@ class EndToEnd(unittest.TestCase):
     if args[:2] in (('git','fetch'),('git','push')):return SimpleNamespace(stdout='')
     if args[:3]==('gh','pr','create'):
      subprocess.run(['npm','run','build'],cwd=Path(cwd)/'website',check=True,capture_output=True,text=True)
-     pages=list((Path(cwd)/'website/dist/articles').rglob('index.html'));self.assertEqual(len(pages),1);self.assertIn('Fixture product security incident',pages[0].read_text());built.append(True)
+     page=Path(cwd)/'website/dist/articles'/draft.stem/'index.html';self.assertTrue(page.is_file());self.assertIn('Fixture product security incident',page.read_text());built.append(True)
      self.assertIn('--draft',args);return SimpleNamespace(stdout='https://example.invalid/pr/1')
     if args[:3]==('git','worktree','remove'):
      site=Path(args[3])/'website';(site/'node_modules').unlink(missing_ok=True)
@@ -39,5 +40,5 @@ class EndToEnd(unittest.TestCase):
     pr.create(draft.name,'Fixture product security incident','A fictional test article','cyber','2026-10-26','fixture/blog',job_id='2026-10-26')
    self.assertTrue(built);self.assertEqual(git('branch','--show-current').stdout.strip(),'main')
    self.assertEqual(len(git('diff','--name-only','main','review/scheduled-2026-10-26').stdout.splitlines()),1)
-   self.assertFalse((root/'website/src/content/articles').exists() and list((root/'website/src/content/articles').glob('*.md')))
+   self.assertEqual({p.relative_to(root/'website/src/content/articles') for p in (root/'website/src/content/articles').rglob('*.md')},baseline_articles)
 if __name__=='__main__':unittest.main()
