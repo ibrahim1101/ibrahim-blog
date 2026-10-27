@@ -156,6 +156,7 @@ def gather_sources(primary, candidates, max_sources=3):
     leads += discover(primary['title'])
     leads += candidates
     seen_urls = {primary['url']}
+    failures=[]
     for item in leads[:95]:
         if len(docs) >= max_sources:
             break
@@ -169,8 +170,11 @@ def gather_sources(primary, candidates, max_sources=3):
                 continue
             docs.append({**item, 'url': final, 'text': body})
             seen_domains.add(domain(final))
-        except Exception:
+        except Exception as exc:
+            if len(failures)<20:failures.append({'domain':domain(url),'error_type':type(exc).__name__})
+            print('Source retrieval failed:',domain(url),type(exc).__name__,file=sys.stderr)
             continue
+    primary['source_retrieval_failures']=failures
     return docs
 
 def collect(category):
@@ -182,6 +186,9 @@ def collect(category):
         try:
             body, _, _ = fetch(feed_url)
             parsed = feedparser.parse(body)
+            if parsed.bozo and not parsed.entries:
+                print('  Warning: invalid or empty feed:',feed_url,file=sys.stderr)
+                continue
             for e in parsed.entries:
                 stamp = e.get('published_parsed') or e.get('updated_parsed')
                 if not stamp:
