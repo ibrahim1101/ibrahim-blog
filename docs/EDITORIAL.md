@@ -16,3 +16,24 @@ The command asks you to type `STAGE`. Staging copies the article to the website 
 The build renders all Markdown files under `website/src/content/articles`; it cannot by itself distinguish a reviewed file from an unreviewed one. **The required security boundary is repository permissions, protected production branch, and Cloudflare production deployment restricted to that branch.** Until those account settings are verified, unapproved content could be published by a direct push or unsafe deployment configuration. PR previews may expose staged content; disable public previews or use access control if needed.
 
 For corrections, edit an existing article on a review branch, add an `updated` date and a clearly visible correction note, and repeat review and merge. No automatic publication feature exists in this project.
+
+## Local review history
+
+After checking the draft and its evidence, record an advisory local decision:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\editor.py decision '<draft filename>.md' --state REVIEWED --reviewer 'Shaik Ibrahim' --note 'Checked each claim and original source'
+.\.venv\Scripts\python.exe scripts\editor.py history '<draft filename>.md'
+```
+
+REVIEWED, NEEDS_REVISION and REJECTED are local audit notes, not authenticated approval or a publish command. The status returns to REVIEW_REQUIRED when the draft, research evidence or quality report changes. The append-only event list is local SQLite and is not tamper-proof. GitHub permissions and branch protection are still required for publication.
+
+## Create a draft pull request
+
+After reviewing or selecting a local draft, install and authenticate the GitHub CLI (`gh`) with the minimum necessary repository permissions. Start from a clean `main` checkout with `origin` pointing to the intended repository. This command creates a new branch, stages only the article, commits, pushes, and opens a **draft** PR; it never approves or merges:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\create_review_pr.py '<draft filename>.md' --title 'Story title' --description 'Accurate summary' --category cyber --date '2026-10-27' --repo ibrahim1101/ibrahim-blog
+```
+
+Public repositories expose PR contents and possibly preview deployments. The command refuses public repositories unless the operator explicitly adds `--allow-public`. Evidence JSON remains local. This PR creation is manually invoked; the scheduler does not automatically send drafts to GitHub. If any step fails, inspect the branch and working tree before retrying. A public PR or a CI pass does not represent editorial approval.

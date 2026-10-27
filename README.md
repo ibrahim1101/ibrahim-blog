@@ -4,7 +4,7 @@ A local-first technology-news workflow and static Astro publication. Research an
 
 ## Start on Windows
 
-Install Python 3.11+ and Node.js 22+, and have Ollama running locally with `qwen3:8b` and `qwen3:14b`. From the project root:
+Install Python 3.11+ and Node.js 24+, and have Ollama running locally with `qwen3:8b` and `qwen3:14b`. From the project root:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\setup.ps1

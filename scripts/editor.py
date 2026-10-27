@@ -7,6 +7,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from editorial_store import connect, state, transition
 
 ROOT=Path(__file__).resolve().parents[1]
 DRAFTS=(ROOT/'drafts').resolve()
@@ -45,6 +46,8 @@ def stage(p,title,description,category,date):
 def main():
     ap=argparse.ArgumentParser(description=__doc__); sub=ap.add_subparsers(dest='cmd',required=True)
     sub.add_parser('list'); show=sub.add_parser('show'); show.add_argument('draft')
+    decision=sub.add_parser('decision'); decision.add_argument('draft'); decision.add_argument('--state',choices=['REVIEW_REQUIRED','NEEDS_REVISION','REJECTED','REVIEWED'],required=True); decision.add_argument('--reviewer',required=True); decision.add_argument('--note',required=True)
+    history=sub.add_parser('history'); history.add_argument('draft')
     st=sub.add_parser('stage'); st.add_argument('draft'); st.add_argument('--title',required=True); st.add_argument('--description',required=True); st.add_argument('--category',choices=sorted(CATEGORIES),required=True); st.add_argument('--date',required=True)
     args=ap.parse_args()
     if args.cmd=='list':
@@ -52,6 +55,16 @@ def main():
     elif args.cmd=='show':
         p=selected(args.draft); evidence,quality=artifacts(p)
         print(p.read_text(encoding='utf-8'));print('\n--- QUALITY REPORT ---\n'+json.dumps(quality,indent=2,ensure_ascii=False));print('\n--- SOURCE EVIDENCE ---\n'+json.dumps(evidence.get('sources',[]),indent=2,ensure_ascii=False))
+    elif args.cmd in ('decision','history'):
+        p=selected(args.draft); artifacts(p); (ROOT/'data').mkdir(exist_ok=True)
+        with connect(ROOT/'data'/'editorial.sqlite3') as db:
+            if args.cmd=='history':
+                print('Current:',state(db,p))
+                for row in db.execute('SELECT at,prior_state,state,actor,note,content_sha256 FROM review_events WHERE draft=? ORDER BY id',(p.name,)):print(json.dumps(row,ensure_ascii=False))
+            else:
+                print('This is a local audit note, not authenticated GitHub approval or permission to publish.')
+                if input('Type RECORD to continue: ').strip()!='RECORD':return 1
+                print('Recorded:',transition(db,p,args.state,args.reviewer,args.note))
     else:
         print('This copies a draft into the website content directory. It is NOT approval. Use a review branch; never push directly to production.')
         if input('Type STAGE to continue: ').strip()!='STAGE': return 1
