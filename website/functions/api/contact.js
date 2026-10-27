@@ -21,7 +21,7 @@ export async function onRequestPost({request,env}) {
   const verify=await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({secret:env.TURNSTILE_SECRET,response:token,remoteip:request.headers.get('CF-Connecting-IP')})});
   const verdict=await verify.json(); if(!verdict.success || verdict.hostname !== new URL(request.url).hostname) return new Response('Verification failed',{status:403});
   const url=new URL(env.CONTACT_WEBHOOK_URL); if(url.protocol!=='https:') return new Response('Contact unavailable',{status:503});
-  const sent=await fetch(url.toString(),{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${env.CONTACT_WEBHOOK_TOKEN}`},body:JSON.stringify({name,email,message}),redirect:'error'});
-  return new Response(sent.ok?'OK':'Delivery failed',{status:sent.ok?200:502});
+  const sent=await fetch(url.toString(),{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${env.CONTACT_WEBHOOK_TOKEN}`},body:JSON.stringify({name,email,message,clientIp:request.headers.get('CF-Connecting-IP')||'unknown'}),redirect:'error'});
+  return new Response(sent.ok?'OK':'Delivery failed',{status:sent.ok?200:sent.status===429?429:502});
   } catch {return new Response('Delivery unavailable',{status:502})}
 }

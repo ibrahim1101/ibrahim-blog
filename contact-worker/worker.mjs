@@ -12,10 +12,16 @@ async function equalSecret(a,b){
 }
 export default {async fetch(request,env){
   if(request.method!=='POST')return new Response('Method not allowed',{status:405,headers:{Allow:'POST'}});
-  if(!env.CONTACT_TOKEN||!env.CONTACT_FROM||!env.CONTACT_TO||!env.EMAIL)return new Response('Unavailable',{status:503});
+  if(!env.CONTACT_TOKEN||!env.CONTACT_FROM||!env.CONTACT_TO||!env.EMAIL||!env.CONTACT_LIMITER)return new Response('Unavailable',{status:503});
   const auth=request.headers.get('Authorization')||'';if(!auth.startsWith('Bearer ')||!(await equalSecret(auth.slice(7),env.CONTACT_TOKEN)))return new Response('Unauthorized',{status:401});
   let item;try{item=JSON.parse(await boundedBody(request))}catch{return new Response('Invalid request',{status:400})}
   const name=typeof item.name==='string'?item.name.trim():'',email=typeof item.email==='string'?item.email.trim():'',message=typeof item.message==='string'?item.message.trim():'';
   if(!name||name.length>100||/[\r\n]/.test(name)||email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||message.length<10||message.length>5000)return new Response('Invalid request',{status:400});
-  try{await env.EMAIL.send({from:env.CONTACT_FROM,to:env.CONTACT_TO,replyTo:email,subject:'IbrahimBlog contact message',text:`Name: ${name}\nEmail: ${email}\n\n${message}`});return new Response('Accepted',{status:202})}catch{return new Response('Delivery unavailable',{status:502})}
+  const client=typeof item.clientIp==='string'&&item.clientIp.length<=64?item.clientIp:'unknown';
+  try{
+    const keyBytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(env.CONTACT_TOKEN+':'+client));
+    const key=Array.from(new Uint8Array(keyBytes),b=>b.toString(16).padStart(2,'0')).join('');
+    const limit=await env.CONTACT_LIMITER.limit({key});
+    if(!limit.success)return new Response('Rate limit exceeded',{status:429});
+    await env.EMAIL.send({from:env.CONTACT_FROM,to:env.CONTACT_TO,replyTo:email,subject:'IbrahimBlog contact message',text:`Name: ${name}\nEmail: ${email}\n\n${message}`});return new Response('Accepted',{status:202})}catch{return new Response('Delivery unavailable',{status:502})}
 }};
